@@ -1,0 +1,26 @@
+@startuml
+actor View as F
+participant Service as S
+participant Database as DB
+
+F -> S: GET /accounts/{id}
+S -> DB: get account by id
+DB --> S: Optional<Account>
+alt account exists
+    S -> S: result = SUCCESSFUL
+else account does not exist
+    S -> S: result = ACCOUNT_NOT_FOUND
+end
+S --> F: 200 OK
+note left
+{
+    result: SUCCESSFUL | ACCOUNT_NOT_FOUND
+    account: {
+        accountNumber: some-uuid
+        name: some name
+        email: some@email.com
+        openingAmount: 50.0
+    }|null
+}
+end note
+@enduml

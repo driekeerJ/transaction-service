@@ -1,0 +1,29 @@
+@startuml
+actor View as F
+participant Service as S
+participant Database as DB
+
+F -> S: POST /accounts
+note right
+{
+    name: some name
+    email: some@email.com
+    openingAmount: 50.0
+}
+end note
+S -> DB: get account by email adress and name
+DB --> S: Optional<Account>
+alt new account
+S -> DB: save account
+DB --> S: accountNumber
+end
+S --> F: 200 OK
+note left
+{
+    result: SUCCESSFUL
+                | ACCOUNT_EXISTS
+                | FAILURE
+    accountNumber: some-uuid
+}
+end note
+@enduml

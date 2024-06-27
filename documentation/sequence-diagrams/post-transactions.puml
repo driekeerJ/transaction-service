@@ -1,0 +1,32 @@
+@startuml
+actor View as F
+participant Service as S
+participant Database as DB
+
+F -> S: POST /transactions
+note right
+{
+    fromAccountNumber: some-uuid,
+    toAccountNumber: some-uuid,
+    description: some description
+    amount: 50.00
+}
+end note
+S -> DB: getAccountsByIds(fromAccountNumber, toAccountNumber)
+DB --> S: [account, account]
+S -> S: isTransactionPossible?
+alt transaction is possible
+    S -> S: update amounts for accounts
+    S -> DB: Persist new amounts
+    DB --> S
+    S -> S: result = SUCCESSFUL
+else insufficient funds
+    S -> S: result = INSUFFICIENT_FUNDS
+end
+S --> F: 200 ok
+note left
+{
+    result: SUCCESSFUL | INSUFFICIENT_FUNDS
+}
+end note
+@enduml
