@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Transaction result</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css} "/>
+</head>
+<body class="m-5">
+<div th:replace="~{fragments/navigation :: navigation}"></div>
+<h1 class="mb-4 mt-3">Transaction Result</h1>
+
+<div th:if="${result == 'SUCCESSFUL'}" class="alert alert-success">
+    <p>Transaction was successful!</p>
+</div>
+<div th:if="${result == 'INSUFFICIENT_FUNDS'}" class="alert alert-danger">
+    <p>Transaction failed due to insufficient funds.</p>
+</div>
+
+</body>
+</html>
