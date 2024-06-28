@@ -1,5 +1,5 @@
 # Documentation
-In the documentation directory you will find some sequence diagrams and choices I made and why I made them. 
+In the documentation directory you will find some sequence diagrams. Great tip, if you don't have the plantuml plugin in your intellij, just copy the raw puml file and paste it in the plantuml web server (https://www.plantuml.com/plantuml/uml/). Off-course this is only for non-confidential information.
 
 # Start up
 To start the application simply run the `TransactionServiceApplication` and after that go to `http://localhost:8080`
