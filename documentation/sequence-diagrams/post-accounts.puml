@@ -1,5 +1,6 @@
 @startuml
 actor View as F
+participant ThymeleafEngine as T
 participant Service as S
 participant Database as DB
 
@@ -13,17 +14,15 @@ note right
 end note
 S -> DB: get account by email adress and name
 DB --> S: Optional<Account>
-alt new account
+alt account exists
+    S -> S: throw error
+    S --> T: error page
+    T --> F: error page
+else new account
 S -> DB: save account
 DB --> S: accountNumber
+S --> T: redirect /accounts/{accountNumber}
+T -> T: get  accounts detail page
+T --> F: render accounts detail page
 end
-S --> F: 200 OK
-note left
-{
-    result: SUCCESSFUL
-                | ACCOUNT_EXISTS
-                | FAILURE
-    accountNumber: some-uuid
-}
-end note
 @enduml

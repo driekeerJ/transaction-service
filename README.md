@@ -17,8 +17,9 @@ I do like to keep my code as clean as possible. That is why I use Lombok for exa
 # What I still wanted to do
 I wanted to restrict myself to the four hours that this challenge should take. There is always more to do and I decided to put some of the work lower on my todo list. I will explain quickly why I chose to put them lower. 
 
-## Frontend validation
-This is our first line of defence to get valid data in the database. On a real time application this could never be so low on the list
+## Backend validation
+This is really important. The only reason I left this behind is the fact that there is already frontend validation and I don't have enough time to do both. 
+Normally I would use @Valid on my endpoints. 
 
 ## Security
 It just would take me too much time to implement security while it wouldn't show you the style of programmer I am.

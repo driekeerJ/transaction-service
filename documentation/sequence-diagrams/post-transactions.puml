@@ -1,5 +1,6 @@
 @startuml
 actor View as F
+participant ThymeleafEngine as T
 participant Service as S
 participant Database as DB
 
@@ -14,7 +15,11 @@ note right
 end note
 S -> DB: getAccountsByIds(fromAccountNumber, toAccountNumber)
 DB --> S: [account, account]
-S -> S: isTransactionPossible?
+alt unknown account
+    S -> S: throw error
+    S --> T: error page
+    T --> F: error page
+end
 alt transaction is possible
     S -> S: update amounts for accounts
     S -> DB: Persist new amounts
@@ -23,10 +28,6 @@ alt transaction is possible
 else insufficient funds
     S -> S: result = INSUFFICIENT_FUNDS
 end
-S --> F: 200 ok
-note left
-{
-    result: SUCCESSFUL | INSUFFICIENT_FUNDS
-}
-end note
+S --> T: result
+T --> F: transaction result page
 @enduml

@@ -19,10 +19,10 @@ public class ApplicationITTestHelper {
     protected static final String MAIL = "bogus@email.com";
     private final AccountRepository accountRepository;
 
-    public UUID saveAccount() {
+    public UUID saveAccount(final BigDecimal amount) {
         final AccountEntity entity = new AccountEntity();
         entity.setName(NAME);
-        entity.setAmount(AMOUNT);
+        entity.setAmount(amount);
         entity.setEmail(MAIL);
         return accountRepository.save(entity).getNumber();
     }

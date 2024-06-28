@@ -1,26 +1,27 @@
 @startuml
 actor View as F
+participant ThymeleafEngine as T
 participant Service as S
 participant Database as DB
 
 F -> S: GET /accounts/{id}
 S -> DB: get account by id
-DB --> S: Optional<Account>
-alt account exists
-    S -> S: result = SUCCESSFUL
-else account does not exist
-    S -> S: result = ACCOUNT_NOT_FOUND
+DB --> S: Account
+alt account does not exist
+    S -> S: throw error
+    S --> T: error page
+    T --> F: error page
 end
-S --> F: 200 OK
+S --> T: 200 OK
 note left
 {
-    status: SUCCESSFUL | ACCOUNT_NOT_FOUND
     account: {
         accountNumber: some-uuid
         name: some name
         email: some@email.com
         openingAmount: 50.0
-    }|null
+    }
 }
 end note
+T --> F: render account page
 @enduml

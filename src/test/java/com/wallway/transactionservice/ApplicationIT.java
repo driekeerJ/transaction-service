@@ -33,6 +33,8 @@ public class ApplicationIT {
 
     private static final String UNKNOWN_ID = "d71499c0-10f1-4973-90c5-bda8585235a0";
     private static final String ERROR_TITLE = "Oops, something happened";
+    private static final String ACCOUNT_NAME = "Test Name";
+    private static final String ACCOUNT_EMAIL = "test@example.com";
     @Autowired
     protected MockMvc mockMvc;
 
@@ -69,7 +71,7 @@ public class ApplicationIT {
 
     @Test
     void when_account_details_for_a_known_account_is_called_then_the_account_details_are_shown() throws Exception {
-        final UUID uuid = testHelper.saveAccount();
+        final UUID uuid = testHelper.saveAccount(AMOUNT);
         final var contentString = getHtmlResult(String.format("/accounts/%s", uuid));
         assertThat(contentString).doesNotContain(ERROR_TITLE);
         assertThat(contentString).contains("Account details");
@@ -87,23 +89,93 @@ public class ApplicationIT {
 
     @Test
     void when_add_account_is_called_then_the_account_is_created_and_redirected() throws Exception {
-        final String name = "Test Name";
-        final String email = "test@example.com";
-        final BigDecimal amount = BigDecimal.valueOf(1000);
-
-        final ResultActions resultActions = mockMvc.perform(post("/accounts/add")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("name", name)
-                .param("email", email)
-                .param("amount", amount.toString()));
+        final ResultActions resultActions = postAccount("Unique name", "Unique email");
 
         resultActions.andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("/accounts/*"));
     }
 
-    private String getHtmlResult(final String url) throws Exception {
-        final var result = sendGetRequest(url)
+    @Test
+    void when_an_account_is_being_created_that_already_exists_then_the_error_page_is_shown() throws Exception {
+        final ResultActions resultActions = postAccount(ACCOUNT_NAME, ACCOUNT_EMAIL);
+        resultActions.andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("/accounts/*"));
+
+
+        final String content = postAccount(ACCOUNT_NAME, ACCOUNT_EMAIL).andReturn().getResponse().getContentAsString();
+        assertThat(content).contains(ERROR_TITLE);
+        assertThat(content).contains(String.format("An account with name %s and email %s, already exists.", ACCOUNT_NAME, ACCOUNT_EMAIL));
+    }
+
+    @Test
+    void when_transactions_is_called_then_the_transaction_page_is_returned() throws Exception {
+        final var contentString = getHtmlResult("/transactions");
+        assertThat(contentString).doesNotContain(ERROR_TITLE);
+        assertThat(contentString).contains("From Account Number");
+        assertThat(contentString).contains("To Account Number");
+    }
+
+    @Test
+    void when_a_transaction_is_performed_then_the_transactions_are_saved_properly_and_a_message_is_shown() throws Exception {
+        final UUID uuidAccountOne = testHelper.saveAccount(AMOUNT);
+        final UUID uuidAccountTwo = testHelper.saveAccount(AMOUNT.add(BigDecimal.valueOf(200)));
+        final BigDecimal transferAmount = AMOUNT.subtract(BigDecimal.valueOf(30));
+
+        final String result = postTransaction(uuidAccountOne, uuidAccountTwo, transferAmount);
+
+        assertThat(result).doesNotContain(ERROR_TITLE);
+        assertThat(result).contains("Transaction Result");
+        assertThat(result).contains("Transaction was successful!");
+
+        final var accountOneDetails = getHtmlResult(String.format("/accounts/%s", uuidAccountOne));
+        assertThat(accountOneDetails).contains(AMOUNT.subtract(transferAmount)
+                .toString());
+        final var accountTwoDetails = getHtmlResult(String.format("/accounts/%s", uuidAccountTwo));
+        assertThat(accountTwoDetails).contains(AMOUNT.add(transferAmount)
+                .toString());
+    }
+
+    @Test
+    void when_a_transaction_is_performed_but_there_is_no_sufficient_funds_then_the_a_message_is_shown() throws Exception {
+        final BigDecimal accountTwoStartingAmount = AMOUNT.add(BigDecimal.valueOf(200));
+        final UUID uuidAccountOne = testHelper.saveAccount(AMOUNT);
+        final UUID uuidAccountTwo = testHelper.saveAccount(accountTwoStartingAmount);
+        final BigDecimal transferAmount = AMOUNT.add(BigDecimal.valueOf(30));
+
+        final String result = postTransaction(uuidAccountOne, uuidAccountTwo, transferAmount);
+
+        assertThat(result).doesNotContain(ERROR_TITLE);
+        assertThat(result).contains("Transaction Result");
+        assertThat(result).contains("Transaction failed due to insufficient funds.");
+
+        final var accountOneDetails = getHtmlResult(String.format("/accounts/%s", uuidAccountOne));
+        assertThat(accountOneDetails).contains(AMOUNT.toString());
+        final var accountTwoDetails = getHtmlResult(String.format("/accounts/%s", uuidAccountTwo));
+        assertThat(accountTwoDetails).contains(accountTwoStartingAmount.toString());
+    }
+
+    private ResultActions postAccount(final String accountName, final String accountEmail) throws Exception {
+        return mockMvc.perform(post("/accounts/add").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", accountName)
+                .param("email", accountEmail)
+                .param("amount", BigDecimal.valueOf(1000).toString()));
+
+    }
+
+    private String postTransaction(final UUID uuidAccountOne, final UUID uuidAccountTwo, final BigDecimal transferAmount) throws Exception {
+        return mockMvc.perform(post("/transactions").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("fromAccountNumber", uuidAccountOne.toString())
+                        .param("toAccountNumber", uuidAccountTwo.toString())
+                        .param("amount", transferAmount.toString()))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType("text/html;charset=UTF-8"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+    }
+
+    private String getHtmlResult(final String url) throws Exception {
+        final var result = sendGetRequest(url).andExpect(status().isOk())
                 .andExpect(content().contentType("text/html;charset=UTF-8"))
                 .andReturn();
 

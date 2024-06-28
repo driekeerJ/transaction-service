@@ -15,11 +15,11 @@
     </div>
     <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" th:field="*{email}" id="email" class="form-control" required>
+        <input type="email" th:field="*{email}" id="email" class="form-control" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required>
     </div>
     <div class="form-group">
         <label for="amount">Amount</label>
-        <input type="number" th:field="*{amount}" id="amount" class="form-control" required>
+        <input type="text" th:field="*{amount}" id="amount" class="form-control" pattern="\d+(\.\d{1,2})?" required>
     </div>
     <button type="submit" class="btn btn-primary">Add Account</button>
 </form>

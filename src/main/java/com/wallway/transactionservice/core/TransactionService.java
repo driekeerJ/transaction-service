@@ -34,7 +34,7 @@ public class TransactionService {
             return TransactionResultType.INSUFFICIENT_FUNDS;
         }
 
-        fromAccount.setAmount(fromAccount.getAmount().min(transaction.amount()));
+        fromAccount.setAmount(fromAccount.getAmount().subtract(transaction.amount()));
         toAccount.setAmount(toAccount.getAmount().add(transaction.amount()));
 
         accountRepository.save(fromAccount);
