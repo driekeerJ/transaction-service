@@ -1,0 +1,18 @@
+<div th:fragment="get-account-details">
+    <script>
+    function submitForm(event) {
+        event.preventDefault();
+        var id = document.getElementById('id').value;
+        var form = document.getElementById('accountForm');
+        form.action = '/accounts/' + id;
+        form.submit();
+    }
+</script>
+<form id="accountForm" onsubmit="submitForm(event)" method="get">
+    <div class="form-group">
+        <label for="id">Account Number</label>
+        <input type="text" class="form-control" id="id" name="id" placeholder="Enter account number">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>

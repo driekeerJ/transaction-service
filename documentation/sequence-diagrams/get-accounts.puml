@@ -14,7 +14,7 @@ end
 S --> F: 200 OK
 note left
 {
-    result: SUCCESSFUL | ACCOUNT_NOT_FOUND
+    status: SUCCESSFUL | ACCOUNT_NOT_FOUND
     account: {
         accountNumber: some-uuid
         name: some name

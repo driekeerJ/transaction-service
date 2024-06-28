@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Account Details</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css} "/>
+</head>
+<body class="m-5">
+<div th:replace="~{fragments/navigation :: navigation}"></div>
+<h1 class="mb-4 mt-3">Account details</h1>
+
+<table class="table">
+    <tr>
+        <th>Number</th>
+        <td th:text="${account.number}"></td>
+    </tr>
+    <tr>
+        <th>Name</th>
+        <td th:text="${account.name}"></td>
+    </tr>
+    <tr>
+        <th>Email</th>
+        <td th:text="${account.email}"></td>
+    </tr>
+    <tr>
+        <th>Amount</th>
+        <td th:text="${account.amount}"></td>
+    </tr>
+</table>
+
+</body>
+</html>

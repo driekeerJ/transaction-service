@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Transaction service</title>
+    <title>Oops something happened</title>
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css} "/>
 </head>
 <body class="m-5">
 <div th:replace="~{fragments/navigation :: navigation}"></div>
-<h1 class="mb-4 mt-3">Transaction service</h1>
-<div class="row">
-    <div th:replace="~{fragments/get-account-details :: get-account-details}"></div>
-</div>
+<h1 class="mb-4 mt-3">Oops, something happened</h1>
+<p th:text="${errorMessage}"></p>
 </body>
 </html>
